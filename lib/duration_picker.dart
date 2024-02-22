@@ -129,7 +129,7 @@ class DialPainter extends CustomPainter {
         text: '$secondaryUnits$baseUnits',
         style: Theme.of(context)
             .textTheme
-            .headline2!
+            .displayMedium!
             .copyWith(fontSize: size.shortestSide * 0.15),
       ),
       textDirection: TextDirection.ltr,
@@ -144,7 +144,7 @@ class DialPainter extends CustomPainter {
       textAlign: TextAlign.center,
       text: TextSpan(
         text: getBaseUnitString(), //th: ${theta}',
-        style: Theme.of(context).textTheme.bodyText2,
+        style: Theme.of(context).textTheme.bodyMedium,
       ),
       textDirection: TextDirection.ltr,
     )..layout();
@@ -543,7 +543,7 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
   }
 
   List<TextPainter> _buildBaseUnitLabels(TextTheme textTheme) {
-    final style = textTheme.subtitle1;
+    final style = textTheme.titleMedium;
 
     var baseUnitMarkerValues = <Duration>[];
 
@@ -603,7 +603,7 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
         backgroundColor = Colors.grey[200];
         break;
       case Brightness.dark:
-        backgroundColor = themeData.backgroundColor;
+        backgroundColor = themeData.colorScheme.background;
         break;
     }
 
@@ -654,6 +654,7 @@ class DurationPickerDialog extends StatefulWidget {
     this.baseUnit = BaseUnit.minute,
     this.snapToMins = 1.0,
     this.decoration,
+    this.removeButtonLabel = 'Remove',
   }) : super(key: key);
 
   /// The duration initially selected when the dialog is shown.
@@ -661,6 +662,7 @@ class DurationPickerDialog extends StatefulWidget {
   final BaseUnit baseUnit;
   final double snapToMins;
   final BoxDecoration? decoration;
+  final String removeButtonLabel;
 
   @override
   DurationPickerDialogState createState() => DurationPickerDialogState();
@@ -691,11 +693,15 @@ class DurationPickerDialogState extends State<DurationPickerDialog> {
   }
 
   void _handleCancel() {
-    Navigator.pop(context);
+    Navigator.pop(context, widget.initialTime);
   }
 
   void _handleOk() {
     Navigator.pop(context, _selectedDuration);
+  }
+
+  void _handleEmpty() {
+    Navigator.pop(context, null);
   }
 
   @override
@@ -721,6 +727,10 @@ class DurationPickerDialogState extends State<DurationPickerDialog> {
       data: ButtonBarTheme.of(context),
       child: ButtonBar(
         children: <Widget>[
+          TextButton(
+            onPressed: _handleEmpty,
+            child: Text(widget.removeButtonLabel),
+          ),
           TextButton(
             onPressed: _handleCancel,
             child: Text(localizations.cancelButtonLabel),
